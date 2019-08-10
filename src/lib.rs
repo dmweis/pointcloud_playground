@@ -79,6 +79,10 @@ impl PointCloud {
         self.points.push(point);
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.points.len() == 0
+    }
+
     pub fn sub_box(self, min: Vector3, max: Vector3) -> PointCloud {
         let mut pointcloud = PointCloud::new();
 
@@ -97,11 +101,14 @@ impl PointCloud {
         pointcloud
     }
 
-    pub fn boundaries(self) -> (Vector3, Vector3) {
+    pub fn boundaries(&self) -> (Vector3, Vector3) {
+        if self.is_empty() {
+            return (Vector3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, 0.0))
+        }
         let mut min = self.points[0];
         let mut max = self.points[0];
 
-        for point in self.points {
+        for point in self.iter_points() {
             if point.x < min.x {min.x = point.x;}
             if point.y < min.y {min.y = point.y;}
             if point.z < min.z {min.z = point.z;}
@@ -171,5 +178,27 @@ mod tests {
 
         assert_eq!(min, smaller);
         assert_eq!(max, bigger);
+    }
+
+    #[test]
+    fn pointcloud_boundary_checking_wont_fail_on_empty() {
+        let cloud = PointCloud::new();
+        let (min, max) = cloud.boundaries();
+
+        assert_eq!(Vector3::new(0.0, 0.0, 0.0), min);
+        assert_eq!(Vector3::new(0.0, 0.0, 0.0), max);
+    }
+
+    #[test]
+    fn pointcloud_is_empty_checks() {
+        let empty_cloud = PointCloud::new();
+        let mut full_cloud = PointCloud::new();
+        full_cloud.add_point(Vector3::new(0.0, 0.0, 0.0));
+        full_cloud.add_point(Vector3::new(2.0, 2.0, 2.0));
+
+
+        assert!(empty_cloud.is_empty());
+        // I feel like ! is too easily missed in this line so I am using == false
+        assert!(full_cloud.is_empty() == false);
     }
 }
