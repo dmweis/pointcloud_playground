@@ -7,7 +7,8 @@ use crate::PointCloud;
 
 pub fn render_pointcloud(pointcloud: &PointCloud) {
     let mut window = Window::new("point_cloud_view");
-
+    window.set_background_color(1.0, 1.0, 1.0);
+    window.set_point_size(3.0);
     let mut points = Vec::new();
 
     for point in pointcloud.iter_points() {
@@ -17,7 +18,7 @@ pub fn render_pointcloud(pointcloud: &PointCloud) {
 
     while window.render() {
         for point in points.iter() {
-            let color = Point3::new(1.0, 0.0, 0.0);
+            let color = Point3::new(0.7, 0.0, 0.7);
             window.draw_point(&point, &color);
         }
     }
